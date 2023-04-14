@@ -21,6 +21,9 @@ function setup() {
 /////////////////////////////////////////////////////////////////
 function preload() {
   blockHit = loadSound("Assets/blockHit.mp3");
+  paddleHit = loadSound("Assets/paddleHit.wav");
+  powerUp = loadSound("Assets/powerUp.wav");
+
 }
 /////////////////////////////////////////////////////////////////
 function draw() {
@@ -35,21 +38,37 @@ function draw() {
   ball.move();
   ball.checkCollision();
 
-  // Draw the bricks
+  // // Draw the bricks
+  // for (let i = 0; i < bricks.length; i++) {
+  //   bricks[i].show();
+  //   if (ball.hits(bricks[i])) {
+  //     bricks.splice(i, 1);
+  //     score += 10;
+  //     ball.reverseY();
+  //   }
+  // }
+
   for (let i = 0; i < bricks.length; i++) {
     bricks[i].show();
     if (ball.hits(bricks[i])) {
-      bricks.splice(i, 1);
-      score += 10;
+      blockHit.play();
+      bricks[i].hits++;
       ball.reverseY();
+      if (bricks[i].hits >= 2) {
+        bricks.splice(i, 1);
+        score += 10;
+      }
     }
+
   }
+
 
   // Draw the score and lives
   textSize(20);
   fill(TEXT_COLOR);
   text("Score: " + score, 10, 30);
   text("Lives: " + lives, width - 80, 30);
+  text("Press the paddle to release ball", width/2 - 140, 30);
 
   // Check for game over
   if (lives <= 0) {
@@ -93,6 +112,7 @@ function createBricks() {
       let y = i * brickHeight + 50;
       let color = BRICK_COLORS[i % BRICK_COLORS.length];
       bricks.push(new Brick(x, y, brickWidth, brickHeight, color));
+      bricks[bricks.length-1].hits = 0;
     }
   }
 }
@@ -228,50 +248,31 @@ class Ball {
 }
 /////////////////////////////////////////////////////////////////
 class Brick {
-  constructor(x, y, width, height, color) {
+  constructor(x, y, w, h, c) {
     this.x = x;
     this.y = y;
-    this.width = width;
-    this.height = height;
-    this.color = color;
+    this.width = w;
+    this.height = h;
+    this.color = c;
+    this.hits = 0; // new variable to keep track of the number of hits the block has taken
   }
-
+  
   show() {
-    fill(this.color);
-    rect(this.x, this.y, this.width, this.height);
-  }
-}
-/////////////////////////////////////////////////////////////////
-class PowerUp {
-  constructor(x, y, type) {
-    this.x = x;
-    this.y = y;
-    this.type = type; // the type of power-up, e.g. "extra life", "larger paddle", "faster ball", etc.
-    this.width = 20;
-    this.height = 20;
-    this.speed = 3;
-    this.isActive = false; // whether the power-up has been activated by the player
-  }
-
-  show() {
-    fill(random(255), random(255), random(255)); // you can change the color of the power-up here
-    rect(this.x, this.y, this.width, this.height);
+    if (this.hits === 0) {
+      fill(this.color);
+      rect(this.x, this.y, this.width, this.height);
+    } 
+    else {
+      // Draw a cracked Brick
+      fill(this.color);
+      strokeWeight(2);
+      rect(this.x, this.y, this.width, this.height);
+      rect(this.x, this.y, this.width/2, this.height/2);
+      rect(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2);
+      rect(this.x + this.width/4, this.y + this.height/4, this.width/2, this.height/2);
+      triangle(this.x, this.y, this.x + this.width/2, this.y + this.height/2, this.x, this.y + this.height);
+      triangle(this.x + this.width, this.y, this.x + this.width/2, this.y + this.height/2, this.x + this.width, this.y + this.height);
+     }
   }
 
-  move() {
-    this.y += this.speed;
-  }
-
-  hits(paddle) {
-    return (
-      this.x + this.width > paddle.x &&
-      this.x < paddle.x + paddle.width &&
-      this.y + this.height > paddle.y &&
-      this.y < paddle.y + paddle.height
-    );
-  }
-
-  activate() {
-    // add code here to activate the power-up when the player hits it with the paddle
-  }
 }
