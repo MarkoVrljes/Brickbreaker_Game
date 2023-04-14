@@ -13,12 +13,16 @@ let level = 1;
 let bricks = [];
 let ball;
 let paddle;
-
+/////////////////////////////////////////////////////////////////
 function setup() {
-  createCanvas(600, 400);
+  createCanvas(windowWidth,windowHeight/2);
   resetGame();
 }
-
+/////////////////////////////////////////////////////////////////
+function preload() {
+  blockHit = loadSound("Assets/blockHit.mp3");
+}
+/////////////////////////////////////////////////////////////////
 function draw() {
   background(BACKGROUND_COLOR);
 
@@ -57,7 +61,17 @@ function draw() {
     nextLevel();
   }
 }
-
+/////////////////////////////////////////////////////////////////
+// function intro() {
+//   background(BACKGROUND_COLOR);
+//   textSize(50);
+//   textAlign(CENTER, CENTER);
+//   fill(TEXT_COLOR);
+//   text("Brick Breaker", width / 2, height / 2 - 50);
+//   textSize(20);
+//   text("Use the mouse to move the paddle and click on the paddle to release the ball.", width / 2, height / 2 + 10);
+// }
+/////////////////////////////////////////////////////////////////
 function resetGame() {
   score = 0;
   lives = 3;
@@ -67,7 +81,7 @@ function resetGame() {
   paddle = new Paddle();
   createBricks();
 }
-
+/////////////////////////////////////////////////////////////////
 function createBricks() {
   let rows = level + 2;
   let cols = 10;
@@ -82,27 +96,28 @@ function createBricks() {
     }
   }
 }
-
+/////////////////////////////////////////////////////////////////
 function nextLevel() {
   level++;
   ball = new Ball();
   paddle = new Paddle();
   createBricks();
 }
-
+/////////////////////////////////////////////////////////////////
 function gameOver() {
   textSize(50);
   textAlign(CENTER, CENTER);
   fill(GAME_OVER_COLOR);
   text("Game Over", width / 2, height / 2);
 }
-
+/////////////////////////////////////////////////////////////////
 class Paddle {
   constructor() {
     this.width = 100;
     this.height = 20;
     this.x = (width - this.width) / 2;
     this.y = height - this.height - 10;
+    this.isDragging = false; // new variable to keep track of whether the user is dragging the paddle
   }
 
   show() {
@@ -111,16 +126,15 @@ class Paddle {
   }
 
   move() {
-    this.x = mouseX;
+    if (mouseIsPressed && mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
+      this.isDragging = true;
+      this.x = mouseX - this.width / 2;
+    }
+    if (this.isDragging) {
+      this.x = mouseX - this.width / 2;
+    }
+    this.x = constrain(this.x, 0, width - this.width);
   }
-  // move() {
-  //   if (keyIsDown(LEFT_ARROW)) {
-  //     this.x -= 10;
-  //   } else if (keyIsDown(RIGHT_ARROW)) {
-  //     this.x += 10;
-  //   }
-  //   this.x = constrain(this.x, 0, width - this.width);
-  // }
 
   hits(ball) {
     return (
@@ -128,88 +142,136 @@ class Paddle {
       ball.x < this.x + this.width &&
       ball.y > this.y &&
       ball.y < this.y + this.height
-      );
+    );
+  }
 }
-}
-
+/////////////////////////////////////////////////////////////////
 class Ball {
-constructor() {
-this.radius = 10;
-this.x = width / 2;
-this.y = height / 2;
-this.xSpeed = random(-5, 5);
-this.ySpeed = -6;
-}
+  constructor() {
+    this.radius = 10;
+    this.x = width / 2;
+    this.y = height / 2;
+    this.xSpeed = random(-5, 5);
+    this.ySpeed = -6;
+    this.isAttached = true; // new variable to keep track of whether the ball is attached to the paddle
+  }
 
-show() {
-fill(BALL_COLOR);
-circle(this.x, this.y, this.radius * 2);
-}
+  show() {
+    fill(BALL_COLOR);
+    circle(this.x, this.y, this.radius * 2);
+  }
 
-move() {
-this.x += this.xSpeed;
-this.y += this.ySpeed;
-this.x = constrain(this.x, this.radius, width - this.radius);
-this.y = constrain(this.y, this.radius, height - this.radius);
-}
+  move() {
+    if (this.isAttached && mouseIsPressed && mouseX > paddle.x && mouseX < paddle.x + paddle.width && mouseY > paddle.y && mouseY < paddle.y + paddle.height) {
+      // release the ball from the paddle
+      this.isAttached = false;
+      this.ySpeed = -6;
+      this.xSpeed = random(-5, 5);
+    }
 
-checkCollision() {
-// Check collision with paddle
-if (paddle.hits(this)) {
-this.reverseY();
-this.y = paddle.y - this.radius;
-}
-  // Check collision with walls
-if (this.x - this.radius <= 0 || this.x + this.radius >= width) {
-  this.reverseX();
-}
-if (this.y - this.radius <= 0) {
-  this.reverseY();
-}
+    if (this.isAttached) {
+      // move the ball with the paddle
+      this.x = paddle.x + paddle.width / 2;
+      this.y = paddle.y - this.radius;
+    } else {
+      // move the ball normally
+      this.x += this.xSpeed * abs(this.ySpeed) / 6;
+      this.y += this.ySpeed;
+      this.x = constrain(this.x, this.radius, width - this.radius);
+      this.y = constrain(this.y, this.radius, height - this.radius);
+    }
+  }
 
-// Check collision with bottom wall (game over)
-if (this.y + this.radius >= height) {
-  lives--;
-  this.reset();
-}
-}
+  checkCollision() {
+    // Check collision with paddle
+    if (paddle.hits(this)) {
+      this.reverseY();
+      this.y = paddle.y - this.radius;
+      // Updates x direction of ball based on where it hits the paddle
+      let distance = this.x - (paddle.x + paddle.width / 2);
+      let normalizedDistance = distance / (paddle.width / 2);
+      this.xSpeed = normalizedDistance * 5;
+    }
+    // Check collision with walls
+    if (this.x - this.radius <= 0 || this.x + this.radius >= width) {
+      this.reverseX();
+    }
+    if (this.y - this.radius <= 0) {
+      this.reverseY();
+    }
+    if (this.y + this.radius >= height) {
+      this.die();
+    }
+  }
 
-hits(brick) {
-let distance = dist(this.x, this.y, brick.x + brick.width / 2, brick.y + brick.height / 2);
-if (distance < this.radius + sqrt(pow(brick.width, 2) + pow(brick.height, 2)) / 2) {
-return true;
-} else {
-return false;
-}
-}
+  die() {
+    lives--;
+    if (lives > 0) {
+      this.isAttached = true;
+    } else {
+      gameOver();
+    }
+  }
 
-reverseX() {
-this.xSpeed *= -1;
-}
+  reverseX() {
+    this.xSpeed *= -1;
+  }
 
-reverseY() {
-this.ySpeed *= -1;
-}
+  reverseY() {
+    this.ySpeed *= -1;
+  }
 
-reset() {
-this.x = width / 2;
-this.y = height / 2;
-this.xSpeed = random(-5, 5);
-this.ySpeed = -6;
+  hits(brick) {
+    let distance = dist(this.x, this.y, brick.x + brick.width / 2, brick.y + brick.height / 2);
+    return distance < this.radius + brick.width / 2;
+  }
 }
-}
-
+/////////////////////////////////////////////////////////////////
 class Brick {
-constructor(x, y, width, height, color) {
-this.x = x;
-this.y = y;
-this.width = width;
-this.height = height;
-this.color = color;
-}
+  constructor(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+  }
 
-show() {
-fill(this.color);
-rect(this.x, this.y, this.width, this.height);
+  show() {
+    fill(this.color);
+    rect(this.x, this.y, this.width, this.height);
+  }
 }
+/////////////////////////////////////////////////////////////////
+class PowerUp {
+  constructor(x, y, type) {
+    this.x = x;
+    this.y = y;
+    this.type = type; // the type of power-up, e.g. "extra life", "larger paddle", "faster ball", etc.
+    this.width = 20;
+    this.height = 20;
+    this.speed = 3;
+    this.isActive = false; // whether the power-up has been activated by the player
+  }
+
+  show() {
+    fill(random(255), random(255), random(255)); // you can change the color of the power-up here
+    rect(this.x, this.y, this.width, this.height);
+  }
+
+  move() {
+    this.y += this.speed;
+  }
+
+  hits(paddle) {
+    return (
+      this.x + this.width > paddle.x &&
+      this.x < paddle.x + paddle.width &&
+      this.y + this.height > paddle.y &&
+      this.y < paddle.y + paddle.height
+    );
+  }
+
+  activate() {
+    // add code here to activate the power-up when the player hits it with the paddle
+  }
 }
