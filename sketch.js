@@ -38,28 +38,17 @@ function draw() {
   ball.move();
   ball.checkCollision();
 
-  // // Draw the bricks
-  // for (let i = 0; i < bricks.length; i++) {
-  //   bricks[i].show();
-  //   if (ball.hits(bricks[i])) {
-  //     bricks.splice(i, 1);
-  //     score += 10;
-  //     ball.reverseY();
-  //   }
-  // }
-
   for (let i = 0; i < bricks.length; i++) {
     bricks[i].show();
     if (ball.hits(bricks[i])) {
       blockHit.play();
-      bricks[i].hits++;
+      bricks[i].damage++;
       ball.reverseY();
-      if (bricks[i].hits >= 2) {
+      if (bricks[i].damage >= 2) {
         bricks.splice(i, 1);
         score += 10;
       }
     }
-
   }
 
 
@@ -81,15 +70,15 @@ function draw() {
   }
 }
 /////////////////////////////////////////////////////////////////
-// function intro() {
-//   background(BACKGROUND_COLOR);
-//   textSize(50);
-//   textAlign(CENTER, CENTER);
-//   fill(TEXT_COLOR);
-//   text("Brick Breaker", width / 2, height / 2 - 50);
-//   textSize(20);
-//   text("Use the mouse to move the paddle and click on the paddle to release the ball.", width / 2, height / 2 + 10);
-// }
+function intro() {
+  background(BACKGROUND_COLOR);
+  textSize(50);
+  textAlign(CENTER, CENTER);
+  fill(TEXT_COLOR);
+  text("Brick Breaker", width / 2, height / 2 - 50);
+  textSize(20);
+  text("Use the mouse to move the paddle to hit the ball and destroy the blocks. Click on the paddle to release the ball.", width / 2, height / 2 + 10);
+}
 /////////////////////////////////////////////////////////////////
 function resetGame() {
   score = 0;
@@ -112,7 +101,7 @@ function createBricks() {
       let y = i * brickHeight + 50;
       let color = BRICK_COLORS[i % BRICK_COLORS.length];
       bricks.push(new Brick(x, y, brickWidth, brickHeight, color));
-      bricks[bricks.length-1].hits = 0;
+      bricks[bricks.length-1].damage = 0;
     }
   }
 }
@@ -254,18 +243,18 @@ class Brick {
     this.width = w;
     this.height = h;
     this.color = c;
-    this.hits = 0; // new variable to keep track of the number of hits the block has taken
+    this.damage = 0; // new variable to keep track of the number of hits the block has taken
   }
   
   show() {
-    if (this.hits === 0) {
+    if (this.damage == 0) {
       fill(this.color);
       rect(this.x, this.y, this.width, this.height);
     } 
     else {
       // Draw a cracked Brick
       fill(this.color);
-      strokeWeight(2);
+      //strokeWeight(2);
       rect(this.x, this.y, this.width, this.height);
       rect(this.x, this.y, this.width/2, this.height/2);
       rect(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2);
