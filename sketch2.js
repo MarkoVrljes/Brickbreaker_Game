@@ -106,10 +106,11 @@ background(BACKGROUND_COLOR);
 
   // Draw the score and lives
   textSize(20);
+  textAlign(CENTER, CENTER);
   fill(TEXT_COLOR);
-  text("Score: " + score, 10, 30);
-  text("Lives: " + lives, width - 80, 30);
-  text("Press the paddle to release the ball", width / 2 - 140, 30);
+  text("Score: " + score, 50, 30);
+  text("Lives: " + lives, width - 50, 30);
+  text("Press the paddle to release the ball", width / 2 , 30);
 
 
   for (let i = 0; i < bricks.length; i++) {
