@@ -23,6 +23,8 @@ let paddle;
 let blockHit;
 let paddleHit;
 let powerUpSound;
+let bgImage;
+
 
 // our game will have 3 possible 'states':
 const INTRO = 0;
@@ -49,6 +51,9 @@ function preload() {
   paddleHit = loadSound("Assets/paddleHit.wav");
   powerUpSound = loadSound("Assets/powerUp.wav");
   song = loadSound("Assets/song.mp3");
+  bgImage = loadImage("Assets/background.jpeg");
+  paddleTexture = loadImage("Assets/paddle.png");
+
 }
 
 /////////////////////////////////////////////////////////////////
@@ -89,8 +94,10 @@ function intro() {
 /////////////////////////////////////////////////////////////////
 
 function runGame() {
-  background(BACKGROUND_COLOR);
 
+  background(BACKGROUND_COLOR);
+  background(bgImage);
+  
   // Draw the paddle
   paddle.show();
   paddle.move();
@@ -136,6 +143,10 @@ function runGame() {
   if (lives <= 0) {
     gameState = GAME_OVER;
   }
+  textSize(20);
+textAlign(CENTER, CENTER);
+fill(TEXT_COLOR);
+text("LEVEL: " + level, width / 2, 30);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -205,6 +216,7 @@ function resetGame() {
   ball = new Ball();
   paddle = new Paddle();
   createBricks();
+  
 }
 
 /////////////////////////////////////////////////////////////////
@@ -437,7 +449,6 @@ class PowerUp {
     this.height = 20;
     this.speed = 3; // adjust this value to change the speed of the power-up
     this.type = floor(random(0, 5));
-    this.expirationTime = millis() + 5000;
   }
 
   show() {
@@ -455,14 +466,6 @@ class PowerUp {
 
   move() {
     this.y += this.speed;
-    if (this.y > height) {
-      // remove power-up if it goes off screen
-      powerUps.splice(powerUps.indexOf(this), 1);
-    }
-    if (millis() >= this.expirationTime) {
-      // remove power-up if it has expired
-      powerUps.splice(powerUps.indexOf(this), 1);
-    }
   }
 
   checkCollision(paddle, i) {
