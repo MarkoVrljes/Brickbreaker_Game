@@ -5,7 +5,7 @@
 
 // Group #21
 // Stefan Djordjevic
-// Mohammed Kazi
+// Mohammed Kazi Tani
 // Marko Vrljes
 
 // Styling variables
