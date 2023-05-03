@@ -30,3 +30,4 @@ screen, the remaining life is depleted each time. After the player uses up all o
 removes every brick on every level, the game will finish.
 
 Play it here: https://editor.p5js.org/markovrljes/sketches/ZjuZ2bzm_
+https://markovrljes.github.io/Brickbreaker_Game/
