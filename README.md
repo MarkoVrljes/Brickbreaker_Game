@@ -2,6 +2,7 @@
 Rta 222 Final Project
 
 Brick-Breaker Proposal
+
 Goal:
 The suggested game is a brick-breaking game that includes bouncing a ball off a paddle to
 shatter bricks. The aim of the game is to remove every brick from a level in order to score
