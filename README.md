@@ -1,4 +1,4 @@
-# Rta 222 Final Project Brickbreaker_Game
+# Rta 222 Final Project
 # Live Website: https://markovrljes.github.io/Brickbreaker_Game/
 
 Brick-Breaker Proposal
