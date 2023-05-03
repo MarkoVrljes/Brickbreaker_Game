@@ -2,6 +2,7 @@
 Rta 222 Final Project
 
 Brick-Breaker Proposal
+
 Goal:
 The suggested game is a brick-breaking game that includes bouncing a ball off a paddle to
 shatter bricks. The aim of the game is to remove every brick from a level in order to score
@@ -29,3 +30,4 @@ screen, the remaining life is depleted each time. After the player uses up all o
 removes every brick on every level, the game will finish.
 
 Play it here: https://editor.p5js.org/markovrljes/sketches/ZjuZ2bzm_
+https://markovrljes.github.io/Brickbreaker_Game/
