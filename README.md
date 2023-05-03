@@ -1,5 +1,5 @@
-# Brickbreaker_Game
-Rta 222 Final Project
+# Rta 222 Final Project Brickbreaker_Game
+# Live Website: https://markovrljes.github.io/Brickbreaker_Game/
 
 Brick-Breaker Proposal
 
@@ -28,6 +28,3 @@ The player will receive feedback from the game on their current level, score and
 lives. When the player destroys the bricks, the score rises, and as the ball leaves the
 screen, the remaining life is depleted each time. After the player uses up all of their lives or
 removes every brick on every level, the game will finish.
-
-Play it here: https://editor.p5js.org/markovrljes/sketches/ZjuZ2bzm_
-https://markovrljes.github.io/Brickbreaker_Game/
