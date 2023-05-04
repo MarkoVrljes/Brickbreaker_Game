@@ -53,8 +53,6 @@ function preload() {
   powerUpSound = loadSound("Assets/powerUp.wav");
   song = loadSound("Assets/song.mp3");
   bgImage = loadImage("Assets/background.jpeg");
-  paddleTexture = loadImage("Assets/paddle.png");
-
 }
 
 /////////////////////////////////////////////////////////////////
