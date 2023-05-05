@@ -1,4 +1,4 @@
-# Rta 222 Final Project
+# A Brickbreaker Game made in p5.js
 # Live Website: https://markovrljes.github.io/Brickbreaker_Game/
 
 Brick-Breaker Proposal
